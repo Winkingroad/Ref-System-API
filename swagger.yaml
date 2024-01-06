@@ -1,0 +1,215 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Referral System API
+definitions:
+  User:
+    type: object
+    properties:
+      userId:
+        type: string
+        description: Unique identifier for the user
+      username:
+        type: string
+        description: Unique username
+      password:
+        type: string
+        description: Hashed password for security
+      balance:
+        type: number
+        description: User's balance
+      referralLink:
+        type: string
+        description: User's referral link
+      referralCount:
+        type: integer
+        description: Number of times the referral link has been used
+      referralExpiry:
+        type: string
+        format: date-time
+        description: Expiry date of the referral link
+      referralLinkUsageHistory:
+        type: array
+        items:
+          type: object
+          properties:
+            referralLink:
+              type: string
+              description: Referral link used
+            dateUsed:
+              type: string
+              format: date-time
+              description: Date when the link was used
+            users:
+              type: array
+              items:
+                type: string
+                description: Users who used the link
+      role:
+        type: string
+        enum: [user, admin]
+        description: User's role
+
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      parameters:
+        - in: body
+          name: user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Validation error
+        '500':
+          description: Server error
+  /login:
+    post:
+      summary: Login a user
+      parameters:
+        - in: body
+          name: user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: User logged in successfully
+        '400':
+          description: Validation error
+        '500':
+          description: Server error
+  /referral/verify:
+    post:
+      summary: Verify and use a referral link
+      parameters:
+        - in: body
+          name: user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Referral link verified successfully
+        '400':
+          description: Validation error
+        '500':
+          description: Server error
+  /add-balance:
+    post:
+      summary: Add balance to a user's account
+      parameters:
+        - in: body
+          name: user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Balance added successfully
+        '400':
+          description: Validation error
+        '500':
+          description: Server error
+  /referral/expire:
+    post:
+      summary: Expire a user's referral link
+      parameters:
+        - in: body
+          name: user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Referral link expired successfully
+        '400':
+          description: Validation error
+        '500':
+          description: Server error
+  /referral/generate:
+    get:
+      summary: Generate a referral link for a user
+      responses:
+        '200':
+          description: Referral link generated successfully
+        '429':
+          description: Too many requests
+        '500':
+          description: Server error
+  /balance:
+    get:
+      summary: Get a user's balance
+      responses:
+        '200':
+          description: Balance retrieved successfully
+        '500':
+          description: Server error
+  /myProfile:
+    get:
+      summary: Get a user's profile
+      responses:
+        '200':
+          description: User profile retrieved successfully
+        '500':
+          description: Server error
+  /users:
+    get:
+      summary: Get all users (admin only)
+      responses:
+        '200':
+          description: Users retrieved successfully
+        '403':
+          description: Forbidden
+        '500':
+          description: Server error
+  /users/{userId}:
+    get:
+      summary: Get a specific user by their ID (admin only)
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: User retrieved successfully
+        '403':
+          description: Forbidden
+        '500':
+          description: Server error
+    put:
+      summary: Update a user's balance (admin only)
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: string
+        - in: body
+          name: user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: User balance updated successfully
+        '400':
+          description: Validation error
+        '403':
+          description: Forbidden
+        '500':
+          description: Server error
+  /referral/expire/{userId}:
+    put:
+      summary: Expire a user's referral link (admin only)
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Referral link expired successfully
+        '403':
+          description: Forbidden
+        '500':
+          description: Server error
